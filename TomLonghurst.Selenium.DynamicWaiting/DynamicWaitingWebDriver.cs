@@ -37,36 +37,37 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             try
             {
                 new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15)).Until(driver =>
-                {
-                    if (!(driver is IJavaScriptExecutor javaScriptExecutor))
-                    {
-                        return true;
-                    }
-
-                    return (bool) javaScriptExecutor.ExecuteScript(
-                        "return document.readyState == \"complete\"");
-                });
+                    ExecuteJavascriptPageFinishedLoadingCheck(driver, "return document.readyState == \"complete\""));
 
                 var currentHost = CurrentHost;
 
                 foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule =>
                     currentHost.Contains(dynamicWaitingRule.Host)))
                 {
-                    new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver =>
-                    {
-                        if (!(driver is IJavaScriptExecutor javaScriptExecutor))
-                        {
-                            return true;
-                        }
-
-                        return (bool) javaScriptExecutor.ExecuteScript(dynamicWaitingRule.Javascript);
-                    });
+                    new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+        }
+
+        private static bool ExecuteJavascriptPageFinishedLoadingCheck(IWebDriver driver, string javascript)
+        {
+            if (!(driver is IJavaScriptExecutor javaScriptExecutor))
+            {
+                return true;
+            }
+
+            var executeScriptResult = javaScriptExecutor.ExecuteScript(javascript);
+
+            if (!(executeScriptResult is bool hasPageFinishedLoading))
+            {
+                return true;
+            }
+            
+            return hasPageFinishedLoading;
         }
 
         private string CurrentHost => new Uri(_webDriver.Url).Host;
