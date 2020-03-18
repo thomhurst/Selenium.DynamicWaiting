@@ -35,14 +35,23 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         {
             new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15)).Until(driver =>
                 (bool) ((IJavaScriptExecutor) driver).ExecuteScript("return document.readyState == \"complete\""));
-            
-            foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule => CurrentHost.Contains(dynamicWaitingRule.Host)))
+
+            try
             {
-                new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver =>
-                    (bool) ((IJavaScriptExecutor) driver).ExecuteScript(dynamicWaitingRule.Javascript));
+                var currentHost = CurrentHost;
+            
+                foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule => currentHost.Contains(dynamicWaitingRule.Host)))
+                {
+                    new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver =>
+                        (bool) ((IJavaScriptExecutor) driver).ExecuteScript(dynamicWaitingRule.Javascript));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
-        private string CurrentHost => new Uri(Url).Host;
+        private string CurrentHost => new Uri(_webDriver.Url).Host;
     }
 }
