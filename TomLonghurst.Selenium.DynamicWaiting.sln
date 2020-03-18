@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomLonghurst.Selenium.DynamicWaiting", "TomLonghurst.Selenium.DynamicWaiting\TomLonghurst.Selenium.DynamicWaiting.csproj", "{D3001846-8A5B-469F-B179-286253A98354}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TomLonghurst.Selenium.DynamicWaiting.Tests", "TomLonghurst.Selenium.DynamicWaiting.Tests\TomLonghurst.Selenium.DynamicWaiting.Tests.csproj", "{5F48A6F5-09C6-4B3C-A442-AE7BD86671F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3001846-8A5B-469F-B179-286253A98354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3001846-8A5B-469F-B179-286253A98354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3001846-8A5B-469F-B179-286253A98354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3001846-8A5B-469F-B179-286253A98354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F48A6F5-09C6-4B3C-A442-AE7BD86671F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F48A6F5-09C6-4B3C-A442-AE7BD86671F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F48A6F5-09C6-4B3C-A442-AE7BD86671F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F48A6F5-09C6-4B3C-A442-AE7BD86671F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
