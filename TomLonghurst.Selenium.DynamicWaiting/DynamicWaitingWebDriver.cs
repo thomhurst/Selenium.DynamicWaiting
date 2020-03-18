@@ -62,12 +62,17 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
             var executeScriptResult = javaScriptExecutor.ExecuteScript(javascript);
 
-            if (!(executeScriptResult is bool hasPageFinishedLoading))
+            if (executeScriptResult is bool hasPageFinishedLoading)
             {
-                return true;
+                return hasPageFinishedLoading;
             }
             
-            return hasPageFinishedLoading;
+            if (bool.TryParse(executeScriptResult.ToString(), out hasPageFinishedLoading))
+            {
+                return hasPageFinishedLoading;
+            }
+            
+            return true;
         }
 
         private string CurrentHost => new Uri(_webDriver.Url).Host;
