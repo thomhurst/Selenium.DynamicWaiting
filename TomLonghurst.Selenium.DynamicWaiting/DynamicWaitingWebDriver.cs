@@ -13,7 +13,8 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         private readonly IWebDriver _webDriver;
         private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
 
-        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : base(parentDriver)
+        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) :
+            base(parentDriver)
         {
             _dynamicWaitingRules = dynamicWaitingRules ?? Enumerable.Empty<DynamicWaitingRule>();
             _webDriver = parentDriver;
@@ -33,17 +34,33 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         private void ExecuteDynamicWait()
         {
-            new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15)).Until(driver =>
-                (bool) ((IJavaScriptExecutor) driver).ExecuteScript("return document.readyState == \"complete\""));
-
             try
             {
+                new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15)).Until(driver =>
+                {
+                    if (!(driver is IJavaScriptExecutor javaScriptExecutor))
+                    {
+                        return true;
+                    }
+
+                    return (bool) javaScriptExecutor.ExecuteScript(
+                        "return document.readyState == \"complete\"");
+                });
+
                 var currentHost = CurrentHost;
-            
-                foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule => currentHost.Contains(dynamicWaitingRule.Host)))
+
+                foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule =>
+                    currentHost.Contains(dynamicWaitingRule.Host)))
                 {
                     new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver =>
-                        (bool) ((IJavaScriptExecutor) driver).ExecuteScript(dynamicWaitingRule.Javascript));
+                    {
+                        if (!(driver is IJavaScriptExecutor javaScriptExecutor))
+                        {
+                            return true;
+                        }
+
+                        return (bool) javaScriptExecutor.ExecuteScript(dynamicWaitingRule.Javascript);
+                    });
                 }
             }
             catch (Exception e)
