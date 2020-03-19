@@ -62,7 +62,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e);
             }
         }
 

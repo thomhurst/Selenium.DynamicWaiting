@@ -20,7 +20,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         public static DynamicWaitingRule JQuery(string host, TimeSpan timeout) =>
             new DynamicWaitingRule(host, JavascriptStatements.JQuery, timeout);
 
-        private void ValidateArguments(string host, string javascript, TimeSpan timeout)
+        private static void ValidateArguments(string host, string javascript, TimeSpan timeout)
         {
             if(string.IsNullOrEmpty(host))
             {
