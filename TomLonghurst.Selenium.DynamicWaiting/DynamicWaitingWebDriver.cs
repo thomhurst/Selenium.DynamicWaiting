@@ -30,6 +30,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             ElementClicked += (sender, args) => ExecuteDynamicWait();
             ElementValueChanged += (sender, args) => ExecuteDynamicWait();
             FindingElement += (sender, args) => ExecuteDynamicWait();
+            ScriptExecuted += (sender, args) => ExecuteDynamicWait();
         }
 
         private void ExecuteDynamicWait()
@@ -39,7 +40,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15))
                     .Until(driver =>
                         ExecuteJavascriptPageFinishedLoadingCheck(driver,
-                            "return document.readyState == \"complete\""));
+                            JavascriptStatements.DocumentReadyStateComplete));
             }
             catch (Exception)
             {
