@@ -36,15 +36,27 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         {
             try
             {
-                new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15)).Until(driver =>
-                    ExecuteJavascriptPageFinishedLoadingCheck(driver, "return document.readyState == \"complete\""));
+                new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15))
+                    .Until(driver =>
+                        ExecuteJavascriptPageFinishedLoadingCheck(driver,
+                            "return document.readyState == \"complete\""));
+            }
+            catch (Exception)
+            {
+                // This isn't one of the DyanmicWaitingRules passed to us - So don't throw exceptions here.
+                // This is just to try and make sure the base page has loaded.
+            }
 
+            try
+            {
                 var currentHost = CurrentHost;
 
                 foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule =>
                     currentHost.Contains(dynamicWaitingRule.Host)))
                 {
-                    new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout).Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
+                    new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout)
+                        .Until(driver =>
+                            ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
                 }
             }
             catch (Exception e)
@@ -66,12 +78,12 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             {
                 return hasPageFinishedLoading;
             }
-            
+
             if (bool.TryParse(executeScriptResult.ToString(), out hasPageFinishedLoading))
             {
                 return hasPageFinishedLoading;
             }
-            
+
             return true;
         }
 
