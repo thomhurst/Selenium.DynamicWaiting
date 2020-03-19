@@ -2,6 +2,6 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 {
     internal static class JavascriptStatements
     {
-        internal static string JQuery = "return jQuery.active == 0";
+        internal static string JQuery = "return window.jQuery == null || jQuery.active == 0";
     }
 }
