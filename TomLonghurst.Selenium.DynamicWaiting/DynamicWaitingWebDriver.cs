@@ -32,7 +32,8 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             ScriptExecuted += (sender, args) => ExecuteDynamicWait();
         }
 
-        private void ExecuteDynamicWait()
+        // ReSharper disable once MemberCanBePrivate.Global
+        public void ExecuteDynamicWait()
         {
             try
             {
