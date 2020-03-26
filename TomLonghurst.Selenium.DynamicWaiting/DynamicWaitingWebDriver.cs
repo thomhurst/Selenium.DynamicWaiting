@@ -32,6 +32,11 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             ScriptExecuted += (sender, args) => ExecuteDynamicWait();
         }
 
+        public new ITargetLocator SwitchTo()
+        {
+            return new DynamicWaitingSwitchTo(this);
+        }
+
         // ReSharper disable once MemberCanBePrivate.Global
         public void ExecuteDynamicWait()
         {
@@ -88,6 +93,17 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             return true;
         }
 
-        private string CurrentHost => new Uri(_webDriver.Url).Host;
+        private string CurrentHost
+        {
+            get
+            {
+                if (!(_webDriver is IJavaScriptExecutor javaScriptExecutor))
+                {
+                    return new Uri(_webDriver.Url).Host;
+                }
+                
+                return (string) javaScriptExecutor.ExecuteScript("return document.URL");
+            }
+        }
     }
 }
