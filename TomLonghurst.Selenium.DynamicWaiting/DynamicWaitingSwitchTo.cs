@@ -55,6 +55,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         private T SwitchAndWait<T>(Func<ITargetLocator, T> action)
         {
             _dynamicWaitingWebDriver.ExecuteDynamicWait();
+            ((IJavaScriptExecutor) _dynamicWaitingWebDriver).ExecuteScript("window.focus();");
             var result = action(_dynamicWaitingWebDriver.SwitchTo());
             _dynamicWaitingWebDriver.ExecuteDynamicWait();
             return result;
