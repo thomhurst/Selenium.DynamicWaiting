@@ -102,7 +102,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                     return new Uri(_webDriver.Url).Host;
                 }
                 
-                return (string) javaScriptExecutor.ExecuteScript("return document.URL");
+                return new Uri((string) javaScriptExecutor.ExecuteScript("return document.URL")).Host;
             }
         }
     }
