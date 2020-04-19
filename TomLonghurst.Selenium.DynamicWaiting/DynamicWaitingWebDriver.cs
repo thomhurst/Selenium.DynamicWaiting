@@ -16,7 +16,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             base(parentDriver)
         {
             _dynamicWaitingRules = dynamicWaitingRules ?? Enumerable.Empty<DynamicWaitingRule>();
-            _webDriver = parentDriver;
+            _webDriver = parentDriver ?? throw new ArgumentNullException(nameof(_webDriver));
 
             SetupEvents();
         }
@@ -99,11 +99,27 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             {
                 if (!(_webDriver is IJavaScriptExecutor javaScriptExecutor))
                 {
-                    return new Uri(_webDriver.Url).Host;
+                    return GetHost(_webDriver.Url);
                 }
                 
-                return new Uri((string) javaScriptExecutor.ExecuteScript("return document.URL")).Host;
+                return GetHost((string) javaScriptExecutor.ExecuteScript("return document.URL"));
             }
+        }
+
+        private string GetHost(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return string.Empty;
+            }
+
+            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
+            {
+                return uri.Host;
+            }
+
+            return string.Empty;
+
         }
     }
 }
