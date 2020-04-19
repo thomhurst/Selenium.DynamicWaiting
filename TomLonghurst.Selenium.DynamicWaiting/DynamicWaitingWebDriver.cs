@@ -106,7 +106,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
         }
 
-        private string GetHost(string url)
+        private static string GetHost(string url)
         {
             if (string.IsNullOrEmpty(url))
             {
