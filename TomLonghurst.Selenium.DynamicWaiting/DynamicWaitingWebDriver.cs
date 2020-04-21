@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Support.Events;
 using OpenQA.Selenium.Support.UI;
 
@@ -19,6 +20,23 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             _webDriver = parentDriver ?? throw new ArgumentNullException(nameof(_webDriver));
 
             SetupEvents();
+        }
+        
+        public static bool IsDynamicWaitingWebDriver(IWebDriver driver, out DynamicWaitingWebDriver dynamicWaitingWebDriver)
+        {
+            if (driver is DynamicWaitingWebDriver dynamicDriver)
+            {
+                dynamicWaitingWebDriver = dynamicDriver;
+                return true;
+            }
+
+            if (driver is IWrapsDriver wrapsDriver && IsDynamicWaitingWebDriver(wrapsDriver.WrappedDriver, out dynamicWaitingWebDriver))
+            {
+                return true;
+            }
+
+            dynamicWaitingWebDriver = null;
+            return false;
         }
 
         private void SetupEvents()
@@ -119,7 +137,6 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
 
             return string.Empty;
-
         }
     }
 }
