@@ -4,6 +4,7 @@ using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Internal;
 using OpenQA.Selenium.Support.Events;
+using OpenQA.Selenium.Support.Extensions;
 using OpenQA.Selenium.Support.UI;
 
 namespace TomLonghurst.Selenium.DynamicWaiting
@@ -115,12 +116,20 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         {
             get
             {
-                if (!(_webDriver is IJavaScriptExecutor javaScriptExecutor))
+                if (_webDriver.WindowHandles.Count == 0)
                 {
+                    return string.Empty;
+                }
+
+                try
+                {
+                    return GetHost(_webDriver.ExecuteJavaScript<string>("return document.URL"));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                     return GetHost(_webDriver.Url);
                 }
-                
-                return GetHost((string) javaScriptExecutor.ExecuteScript("return document.URL"));
             }
         }
 
