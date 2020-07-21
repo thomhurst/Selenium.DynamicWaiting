@@ -34,12 +34,14 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         public IWebDriver Window(string windowName)
         {
-            return SwitchAndWait(switchTo => switchTo.Window(windowName));
+            var isDefaultContent = windowName == _dynamicWaitingWebDriver.OriginalWindowHandle;
+            
+            return SwitchAndWait(switchTo => switchTo.Window(windowName), isDefaultContent);
         }
 
         public IWebDriver DefaultContent()
         {
-            return SwitchAndWait(switchTo => switchTo.DefaultContent());
+            return SwitchAndWait(switchTo => switchTo.DefaultContent(), true);
         }
 
         public IWebElement ActiveElement()
@@ -49,20 +51,22 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         public IAlert Alert()
         {
-            return SwitchAndWait(switchTo => switchTo.Alert());
+            return SwitchAndWait(switchTo => switchTo.Alert(), true);
         }
 
-        private T SwitchAndWait<T>(Func<ITargetLocator, T> action)
+        private T SwitchAndWait<T>(Func<ITargetLocator, T> action, bool isDefaultContent = false)
         {
+            _dynamicWaitingWebDriver.IsDefaultContent = isDefaultContent;
+            
             if (_dynamicWaitingWebDriver.DynamicWaitingSettings.WaitAfterSwitchingWindow)
             {
                 return action(_dynamicWaitingWebDriver.SwitchTo());
             }
             
-            _dynamicWaitingWebDriver.ExecuteDynamicWait();
-            ((IJavaScriptExecutor) _dynamicWaitingWebDriver).ExecuteScript("window.focus();");
             var result = action(_dynamicWaitingWebDriver.SwitchTo());
+            
             _dynamicWaitingWebDriver.ExecuteDynamicWait();
+            
             return result;
         }
     }

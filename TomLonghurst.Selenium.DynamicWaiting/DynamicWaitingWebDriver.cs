@@ -14,6 +14,8 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         private readonly IWebDriver _webDriver;
         private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
         internal DynamicWaitingSettings DynamicWaitingSettings { get; }
+        internal bool IsDefaultContent { get; set; } = true;
+        internal string OriginalWindowHandle { get; }
 
         public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, new DynamicWaitingSettings
         {
@@ -31,6 +33,8 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             _webDriver = parentDriver ?? throw new ArgumentNullException(nameof(_webDriver));
             DynamicWaitingSettings = dynamicWaitingSettings ?? new DynamicWaitingSettings();
 
+            OriginalWindowHandle = _webDriver.CurrentWindowHandle;
+            
             SetupEvents();
         }
         
@@ -137,6 +141,12 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 if (_webDriver.WindowHandles.Count == 0)
                 {
                     return string.Empty;
+                }
+
+                // Javascript document.URL is only really beneficial for iFrames
+                if (IsDefaultContent)
+                {
+                    return GetHost(_webDriver.Url);
                 }
 
                 try
