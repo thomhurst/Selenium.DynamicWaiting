@@ -13,12 +13,23 @@ namespace TomLonghurst.Selenium.DynamicWaiting
     {
         private readonly IWebDriver _webDriver;
         private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
+        internal DynamicWaitingSettings DynamicWaitingSettings { get; }
 
-        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) :
+        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, new DynamicWaitingSettings
+        {
+            WaitAfterScriptExecution = true,
+            WaitForPageLoadCompletion = true,
+            WaitAfterSwitchingWindow = true
+        })
+        {
+        }
+
+        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules, DynamicWaitingSettings dynamicWaitingSettings) :
             base(parentDriver)
         {
             _dynamicWaitingRules = dynamicWaitingRules ?? Enumerable.Empty<DynamicWaitingRule>();
             _webDriver = parentDriver ?? throw new ArgumentNullException(nameof(_webDriver));
+            DynamicWaitingSettings = dynamicWaitingSettings ?? new DynamicWaitingSettings();
 
             SetupEvents();
         }
@@ -42,13 +53,23 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         private void SetupEvents()
         {
-            Navigated += (sender, args) => ExecuteDynamicWait();
-            NavigatedBack += (sender, args) => ExecuteDynamicWait();
-            NavigatedForward += (sender, args) => ExecuteDynamicWait();
-            ElementClicked += (sender, args) => ExecuteDynamicWait();
-            ElementValueChanged += (sender, args) => ExecuteDynamicWait();
             FindingElement += (sender, args) => ExecuteDynamicWait();
-            ScriptExecuted += (sender, args) => ExecuteDynamicWait();
+            
+            if (DynamicWaitingSettings.WaitForPageLoadCompletion)
+            {
+                Navigated += (sender, args) => ExecuteDynamicWait();
+                NavigatedBack += (sender, args) => ExecuteDynamicWait();
+                NavigatedForward += (sender, args) => ExecuteDynamicWait();
+            }
+
+            ElementClicked += (sender, args) => ExecuteDynamicWait();
+            
+            ElementValueChanged += (sender, args) => ExecuteDynamicWait();
+
+            if (DynamicWaitingSettings.WaitAfterScriptExecution)
+            {
+                ScriptExecuted += (sender, args) => ExecuteDynamicWait();
+            }
         }
 
         public new ITargetLocator SwitchTo()
@@ -62,13 +83,11 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             try
             {
                 new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15))
-                    .Until(driver =>
-                        ExecuteJavascriptPageFinishedLoadingCheck(driver,
-                            JavascriptStatements.DocumentReadyStateComplete));
+                    .Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, JavascriptStatements.DocumentReadyStateComplete));
             }
             catch (Exception)
             {
-                // This isn't one of the DyanmicWaitingRules passed to us - So don't throw exceptions here.
+                // This isn't one of the DynamicWaitingRules passed to us - So don't throw exceptions here.
                 // This is just to try and make sure the base page has loaded.
             }
 
@@ -80,8 +99,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                     currentHost.Contains(dynamicWaitingRule.Host)))
                 {
                     new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout)
-                        .Until(driver =>
-                            ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
+                        .Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
                 }
             }
             catch (Exception e)
@@ -147,5 +165,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
             return string.Empty;
         }
+        
+        
     }
 }
