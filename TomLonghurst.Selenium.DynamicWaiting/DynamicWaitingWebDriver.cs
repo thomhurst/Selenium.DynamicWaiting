@@ -168,6 +168,11 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 {
                     return string.Empty;
                 }
+                
+                if (WindowNotOpen() && !DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
+                {
+                    return string.Empty;
+                }
 
                 // Javascript document.URL is only really beneficial for iFrames
                 if (IsDefaultContent)
