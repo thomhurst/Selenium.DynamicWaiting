@@ -57,16 +57,14 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         private T SwitchAndWait<T>(Func<ITargetLocator, T> action, bool isDefaultContent = false)
         {
             _dynamicWaitingWebDriver.IsDefaultContent = isDefaultContent;
-            
-            if (_dynamicWaitingWebDriver.DynamicWaitingSettings.WaitAfterSwitchingWindow)
+
+            var result = action(_dynamicWaitingWebDriver.WrappedDriver.SwitchTo());
+
+            if (_dynamicWaitingWebDriver.DynamicWaitingSettings.WaitAfterSwitchingTarget)
             {
-                return action(_dynamicWaitingWebDriver.SwitchTo());
+                _dynamicWaitingWebDriver.ExecuteDynamicWait();
             }
-            
-            var result = action(_dynamicWaitingWebDriver.SwitchTo());
-            
-            _dynamicWaitingWebDriver.ExecuteDynamicWait();
-            
+
             return result;
         }
     }

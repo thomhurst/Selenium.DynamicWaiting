@@ -17,12 +17,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         internal bool IsDefaultContent { get; set; } = true;
         internal string OriginalWindowHandle { get; }
 
-        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, new DynamicWaitingSettings
-        {
-            WaitAfterScriptExecution = true,
-            WaitForPageLoadCompletion = true,
-            WaitAfterSwitchingWindow = true
-        })
+        public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, DynamicWaitingSettings.Default)
         {
         }
 
@@ -84,10 +79,18 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         // ReSharper disable once MemberCanBePrivate.Global
         public void ExecuteDynamicWait()
         {
+            if (WindowNotOpen())
+            {
+                return;
+            }
+
+            ;
             try
             {
                 new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15))
-                    .Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, JavascriptStatements.DocumentReadyStateComplete));
+                    .Until(driver =>
+                        ExecuteJavascriptPageFinishedLoadingCheck(driver,
+                            JavascriptStatements.DocumentReadyStateComplete));
             }
             catch (Exception)
             {
@@ -110,6 +113,29 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             {
                 Console.Out.WriteLine(e);
             }
+        }
+
+        private bool WindowNotOpen()
+        {
+            try
+            {
+                var _ = _webDriver.CurrentWindowHandle;
+            }
+            catch (Exception exception)
+            {
+                if (exception is NoSuchWindowException || exception is NoSuchFrameException)
+                {
+                    if (DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
+                    {
+                        SwitchTo().Window(OriginalWindowHandle);
+                        SwitchTo().DefaultContent();
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool ExecuteJavascriptPageFinishedLoadingCheck(IWebDriver driver, string javascript)
