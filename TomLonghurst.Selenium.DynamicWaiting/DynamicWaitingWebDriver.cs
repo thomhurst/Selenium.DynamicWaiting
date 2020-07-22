@@ -79,7 +79,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         // ReSharper disable once MemberCanBePrivate.Global
         public void ExecuteDynamicWait()
         {
-            if (WindowNotOpen())
+            if (CurrentWindowHasBeenClosed())
             {
                 return;
             }
@@ -115,7 +115,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
         }
 
-        private bool WindowNotOpen()
+        private bool CurrentWindowHasBeenClosed()
         {
             try
             {
@@ -169,7 +169,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                     return string.Empty;
                 }
                 
-                if (WindowNotOpen() && !DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
+                if (CurrentWindowHasBeenClosed() && !DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
                 {
                     return string.Empty;
                 }
