@@ -38,7 +38,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             get => base.Url;
             set
             {
-                if (DynamicWaitingSettings.InterceptUrlActions?.Any(urlAction => urlAction.Action(value)) == true)
+                if (DynamicWaitingSettings.StopNavigatingToUrlActions?.Any(urlAction => urlAction.Action(value)) == true)
                 {
                     return;
                 }
