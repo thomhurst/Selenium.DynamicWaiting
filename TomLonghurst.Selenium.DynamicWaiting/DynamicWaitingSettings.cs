@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TomLonghurst.Selenium.DynamicWaiting
 {
     public class DynamicWaitingSettings
@@ -6,6 +8,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         public bool WaitAfterScriptExecution { get; set; }
         public bool WaitAfterSwitchingTarget { get; set; }
         public bool AutomaticallyDetectClosedWindows { get; set; }
+        public List<InterceptUrlAction> InterceptUrlActions = new List<InterceptUrlAction>();
 
         public static DynamicWaitingSettings Default { get; } = new DynamicWaitingSettings
         {

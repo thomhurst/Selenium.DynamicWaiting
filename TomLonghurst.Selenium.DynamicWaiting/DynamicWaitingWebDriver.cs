@@ -32,7 +32,21 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             
             SetupEvents();
         }
-        
+
+        public new string Url
+        {
+            get => base.Url;
+            set
+            {
+                if (DynamicWaitingSettings.InterceptUrlActions?.Any(urlAction => urlAction.Action(value)) == true)
+                {
+                    return;
+                }
+
+                base.Url = value;
+            }
+        }
+
         public static bool IsDynamicWaitingWebDriver(IWebDriver driver, out DynamicWaitingWebDriver dynamicWaitingWebDriver)
         {
             if (driver is DynamicWaitingWebDriver dynamicDriver)
