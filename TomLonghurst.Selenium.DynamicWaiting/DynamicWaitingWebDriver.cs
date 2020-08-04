@@ -51,19 +51,17 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         public static bool IsDynamicWaitingWebDriver(IWebDriver driver, out DynamicWaitingWebDriver dynamicWaitingWebDriver)
         {
-            if (driver is DynamicWaitingWebDriver dynamicDriver)
+            switch (driver)
             {
-                dynamicWaitingWebDriver = dynamicDriver;
-                return true;
+                case DynamicWaitingWebDriver dynamicDriver:
+                    dynamicWaitingWebDriver = dynamicDriver;
+                    return true;
+                case IWrapsDriver wrapsDriver when IsDynamicWaitingWebDriver(wrapsDriver.WrappedDriver, out dynamicWaitingWebDriver):
+                    return true;
+                default:
+                    dynamicWaitingWebDriver = null;
+                    return false;
             }
-
-            if (driver is IWrapsDriver wrapsDriver && IsDynamicWaitingWebDriver(wrapsDriver.WrappedDriver, out dynamicWaitingWebDriver))
-            {
-                return true;
-            }
-
-            dynamicWaitingWebDriver = null;
-            return false;
         }
 
         private void SetupEvents()
@@ -195,7 +193,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Console.Out.WriteLine(e);
                     return GetHost(_webDriver.Url);
                 }
             }

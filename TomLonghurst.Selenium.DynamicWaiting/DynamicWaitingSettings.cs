@@ -8,7 +8,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         public bool WaitAfterScriptExecution { get; set; }
         public bool WaitAfterSwitchingTarget { get; set; }
         public bool AutomaticallyDetectClosedWindows { get; set; }
-        public List<InterceptUrlAction> StopNavigatingToUrlActions = new List<InterceptUrlAction>();
+        public List<InterceptUrlAction> StopNavigatingToUrlActions { get; } = new List<InterceptUrlAction>();
 
         public static DynamicWaitingSettings Default { get; } = new DynamicWaitingSettings
         {
