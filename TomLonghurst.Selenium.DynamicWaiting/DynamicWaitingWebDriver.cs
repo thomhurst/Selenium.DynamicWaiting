@@ -107,20 +107,6 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 return;
             }
 
-            ;
-            try
-            {
-                new WebDriverWait(_webDriver, TimeSpan.FromSeconds(15))
-                    .Until(driver =>
-                        ExecuteJavascriptPageFinishedLoadingCheck(driver,
-                            JavascriptStatements.DocumentReadyStateComplete));
-            }
-            catch (Exception)
-            {
-                // This isn't one of the DynamicWaitingRules passed to us - So don't throw exceptions here.
-                // This is just to try and make sure the base page has loaded.
-            }
-
             try
             {
                 var currentHost = CurrentHost;
