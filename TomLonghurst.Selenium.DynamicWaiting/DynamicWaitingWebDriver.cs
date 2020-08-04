@@ -11,11 +11,13 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 {
     public class DynamicWaitingWebDriver : EventFiringWebDriver
     {
-        private readonly IWebDriver _webDriver;
-        private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
+        public bool SkipNextWait { get; set; }
         internal DynamicWaitingSettings DynamicWaitingSettings { get; }
         internal bool IsDefaultContent { get; set; } = true;
         internal string OriginalWindowHandle { get; }
+        private readonly IWebDriver _webDriver;
+        private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
+
 
         public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, DynamicWaitingSettings.Default)
         {
@@ -91,8 +93,15 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
+
         public void ExecuteDynamicWait()
         {
+            if (SkipNextWait)
+            {
+                SkipNextWait = false;
+                return;
+            }
+            
             if (CurrentWindowHasBeenClosed())
             {
                 return;
