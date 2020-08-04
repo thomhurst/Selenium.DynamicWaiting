@@ -49,14 +49,14 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
         }
 
-        public static bool IsDynamicWaitingWebDriver(IWebDriver driver, out DynamicWaitingWebDriver dynamicWaitingWebDriver)
+        public static bool TryGetDynamicWaitingWebDriver(IWebDriver driver, out DynamicWaitingWebDriver dynamicWaitingWebDriver)
         {
             switch (driver)
             {
                 case DynamicWaitingWebDriver dynamicDriver:
                     dynamicWaitingWebDriver = dynamicDriver;
                     return true;
-                case IWrapsDriver wrapsDriver when IsDynamicWaitingWebDriver(wrapsDriver.WrappedDriver, out dynamicWaitingWebDriver):
+                case IWrapsDriver wrapsDriver when TryGetDynamicWaitingWebDriver(wrapsDriver.WrappedDriver, out dynamicWaitingWebDriver):
                     return true;
                 default:
                     dynamicWaitingWebDriver = null;
