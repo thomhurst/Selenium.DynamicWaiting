@@ -17,6 +17,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
         internal string OriginalWindowHandle { get; }
         private readonly IWebDriver _webDriver;
         private readonly IEnumerable<DynamicWaitingRule> _dynamicWaitingRules;
+        private bool _isDisposing;
 
 
         public DynamicWaitingWebDriver(IWebDriver parentDriver, IEnumerable<DynamicWaitingRule> dynamicWaitingRules) : this(parentDriver, dynamicWaitingRules, DynamicWaitingSettings.Default)
@@ -37,7 +38,15 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
         public new string Url
         {
-            get => base.Url;
+            get
+            {
+                if(CurrentWindowHasBeenClosed())
+                {
+                    SwitchToMainWindow();
+                }
+                
+                return base.Url;
+            }
             set
             {
                 if (DynamicWaitingSettings.StopNavigatingToUrlActions?.Any(urlAction => urlAction.Action(value)) == true)
@@ -90,10 +99,16 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             return new DynamicWaitingSwitchTo(this);
         }
 
+
         // ReSharper disable once MemberCanBePrivate.Global
 
         public void ExecuteDynamicWait()
         {
+            if (_isDisposing)
+            {
+                return;
+            }
+            
             if (SkipNextWait)
             {
                 SkipNextWait = false;
@@ -134,8 +149,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
                 {
                     if (DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
                     {
-                        SwitchTo().Window(OriginalWindowHandle);
-                        SwitchTo().DefaultContent();
+                        SwitchToMainWindow();
                     }
 
                     return true;
@@ -143,6 +157,20 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
 
             return false;
+        }
+
+        private void SwitchToMainWindow()
+        {
+            if (_isDisposing)
+            {
+                return;
+            }
+            
+            if (WindowHandles.Count > 0)
+            {
+                SwitchTo().Window(OriginalWindowHandle);
+                SwitchTo().DefaultContent();
+            }
         }
 
         private static bool ExecuteJavascriptPageFinishedLoadingCheck(IWebDriver driver, string javascript)
@@ -213,7 +241,11 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
             return string.Empty;
         }
-        
-        
+
+        protected override void Dispose(bool disposing)
+        {
+            _isDisposing = disposing;
+            base.Dispose(disposing);
+        }
     }
 }
