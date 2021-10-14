@@ -39,6 +39,11 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             return SwitchAndWait(switchTo => switchTo.Window(windowName), isDefaultContent);
         }
 
+        public IWebDriver NewWindow(WindowType typeHint)
+        {
+            return SwitchAndWait(switchTo => switchTo.NewWindow(typeHint));
+        }
+
         public IWebDriver DefaultContent()
         {
             return SwitchAndWait(switchTo => switchTo.DefaultContent(), true);
