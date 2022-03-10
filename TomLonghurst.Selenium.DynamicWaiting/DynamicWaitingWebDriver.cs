@@ -142,7 +142,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
             catch (Exception exception)
             {
-                if (exception is NoSuchWindowException || exception is NoSuchFrameException)
+                if (exception is NoSuchWindowException or NoSuchFrameException)
                 {
                     if (DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
                     {
