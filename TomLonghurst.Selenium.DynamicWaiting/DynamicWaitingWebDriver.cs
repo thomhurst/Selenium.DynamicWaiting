@@ -122,10 +122,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting
 
             try
             {
-                var currentHost = CurrentHost;
-
-                foreach (var dynamicWaitingRule in _dynamicWaitingRules.Where(dynamicWaitingRule =>
-                    currentHost.Contains(dynamicWaitingRule.Host)))
+                foreach (var dynamicWaitingRule in _dynamicWaitingRules)
                 {
                     new WebDriverWait(_webDriver, dynamicWaitingRule.Timeout)
                         .Until(driver => ExecuteJavascriptPageFinishedLoadingCheck(driver, dynamicWaitingRule.Javascript));
@@ -193,53 +190,6 @@ namespace TomLonghurst.Selenium.DynamicWaiting
             }
 
             return true;
-        }
-
-        private string CurrentHost
-        {
-            get
-            {
-                if (_webDriver.WindowHandles.Count == 0)
-                {
-                    return string.Empty;
-                }
-                
-                if (CurrentWindowHasBeenClosed() && !DynamicWaitingSettings.AutomaticallyDetectClosedWindows)
-                {
-                    return string.Empty;
-                }
-
-                // Javascript document.URL is only really beneficial for iFrames
-                if (IsDefaultContent)
-                {
-                    return GetHost(_webDriver.Url);
-                }
-
-                try
-                {
-                    return GetHost(_webDriver.ExecuteJavaScript<string>("return document.URL"));
-                }
-                catch (Exception e)
-                {
-                    Console.Out.WriteLine(e);
-                    return GetHost(_webDriver.Url);
-                }
-            }
-        }
-
-        private static string GetHost(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-            {
-                return string.Empty;
-            }
-
-            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
-            {
-                return uri.Host;
-            }
-
-            return string.Empty;
         }
 
         protected override void Dispose(bool disposing)

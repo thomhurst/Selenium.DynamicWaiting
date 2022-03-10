@@ -16,7 +16,7 @@ namespace TomLonghurst.Selenium.DynamicWaiting.Tests
              var baseWebDriver = new ChromeDriver();
              _dynamicWaitingWebDriver = new DynamicWaitingWebDriver(baseWebDriver, new []
              {
-                 DynamicWaitingRule.JQuery("asos.com", TimeSpan.FromSeconds(30)), 
+                 DynamicWaitingRule.JQuery(TimeSpan.FromSeconds(30)), 
              });
         }
 
